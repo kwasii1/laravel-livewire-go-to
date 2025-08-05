@@ -6,6 +6,7 @@
   "engines": {
     "vscode": "^1.102.0"
   },
+  "icon": "images/laravel-livewire-go-to-icon.jpg",
   "keywords": [
     "PHP", "Laravel", "Livewire", "Volt", "Blade", "Flux"
   ],
