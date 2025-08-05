@@ -4,7 +4,10 @@
   "description": "Go to support with ctrl+click to switch between components in laravel and livewire",
   "publisher": "kwasibaidoo",
   "version": "1.0.0",
-  "repository": "https://github.com:kwasii1/laravel-livewire-go-to.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kwasii1/laravel-livewire-go-to.git"
+  },
   "pricing": "Free",
   "engines": {
     "vscode": "^1.102.0"
