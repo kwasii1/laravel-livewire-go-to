@@ -2,7 +2,8 @@
   "name": "laravel-livewire-go-to",
   "displayName": "laravel-livewire-go-to",
   "description": "Go to support with ctrl+click to switch between components in laravel and livewire",
-  "version": "0.0.1",
+  "publisher": "kwasibaidoo",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.102.0"
   },
