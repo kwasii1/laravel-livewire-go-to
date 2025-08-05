@@ -4,6 +4,7 @@
   "description": "Go to support with ctrl+click to switch between components in laravel and livewire",
   "publisher": "kwasibaidoo",
   "version": "1.0.0",
+  "pricing": "Free",
   "engines": {
     "vscode": "^1.102.0"
   },
