@@ -159,7 +159,7 @@ Volt::route('/profile', 'pages.profile');
 
 ## Contributing
 
-Found a bug or want to contribute? Please visit our [GitHub repository](https://github.com/your-username/laravel-livewire-go-to) to:
+Found a bug or want to contribute? Please visit our [GitHub repository](https://github.com/kwasii1/laravel-livewire-go-to) to:
 
 - Report issues
 - Submit feature requests
