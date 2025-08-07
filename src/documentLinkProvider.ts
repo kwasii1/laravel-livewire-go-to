@@ -227,6 +227,12 @@ export class ComponentDocumentLinkProvider
         componentPath,
         "index.blade.php"
       ),
+      path.join(
+        workspaceRoot,
+        "resources/views/components",
+        componentPath,
+        `${componentPath}.blade.php`
+      )
     ];
   }
 
