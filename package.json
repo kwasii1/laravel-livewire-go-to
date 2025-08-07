@@ -3,7 +3,7 @@
   "displayName": "laravel-livewire-go-to",
   "description": "Go to support with ctrl+click to switch between components in laravel and livewire",
   "publisher": "kwasibaidoo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/kwasii1/laravel-livewire-go-to.git"
@@ -14,7 +14,12 @@
   },
   "icon": "images/laravel-livewire-go-to-icon.jpg",
   "keywords": [
-    "PHP", "Laravel", "Livewire", "Volt", "Blade", "Flux"
+    "PHP",
+    "Laravel",
+    "Livewire",
+    "Volt",
+    "Blade",
+    "Flux"
   ],
   "categories": [
     "Other"
@@ -27,17 +32,29 @@
   "contributes": {
     "commands": [],
     "languages": [
-        {
-            "id": "blade",
-            "extensions": [".blade.php"],
-            "aliases": ["Blade", "blade"]
-        },
-        {
-            "id": "php",
-            "extensions": [".blade.php", "php"],
-            "aliases": ["PHP", "php", "Php"]
-        }
-      ]
+      {
+        "id": "blade",
+        "extensions": [
+          ".blade.php"
+        ],
+        "aliases": [
+          "Blade",
+          "blade"
+        ]
+      },
+      {
+        "id": "php",
+        "extensions": [
+          ".blade.php",
+          "php"
+        ],
+        "aliases": [
+          "PHP",
+          "php",
+          "Php"
+        ]
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
