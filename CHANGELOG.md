@@ -8,13 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-
 - Configuration options for custom component paths
-- Support for additional Laravel UI libraries
+- Support for additional Laravel UI libraries  
 - Performance optimizations for large projects
 - Multi-workspace support improvements
+- Breadcrumb navigation for deeply nested components
+- Component usage analytics and insights
 
-## [0.0.1] - 2025-08-05
+### In Progress
+- Documentation improvements and usage examples
+- Enhanced error handling and user feedback
+- Code refactoring for better maintainability
+
+## [0.0.1] - 2025-08-07
 
 ### Added
 
