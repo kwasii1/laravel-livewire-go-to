@@ -129,7 +129,7 @@ Volt::route(`;
     <x-footer />
 </x-layout>`;
 
-      const document = await createMockDocument(content);
+      const _document = await createMockDocument(content);
       const startTime = Date.now();
 
       const lines = content.split("\n");

@@ -7,7 +7,7 @@ export class ComponentDefinitionProvider implements vscode.DefinitionProvider {
   provideDefinition(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken
+    _token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.Definition> {
     console.log(
       `Definition requested at line ${position.line}, character ${position.character}`
