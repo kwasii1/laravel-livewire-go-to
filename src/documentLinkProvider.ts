@@ -8,7 +8,7 @@ export class ComponentDocumentLinkProvider
 {
   provideDocumentLinks(
     document: vscode.TextDocument,
-    token: vscode.CancellationToken
+    _token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.DocumentLink[]> {
     const links: vscode.DocumentLink[] = [];
     const text = document.getText();

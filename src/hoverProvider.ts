@@ -5,7 +5,7 @@ export class ComponentHoverProvider implements vscode.HoverProvider {
   provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken
+    _token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.Hover> {
     console.log(
       `Hover requested at line ${position.line}, character ${position.character}`

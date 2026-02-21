@@ -14,6 +14,13 @@ export default tseslint.config(
           format: ["camelCase", "PascalCase"],
         },
       ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
       curly: "warn",
       eqeqeq: "warn",
       "no-throw-literal": "warn",

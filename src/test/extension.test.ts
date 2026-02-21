@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
@@ -414,7 +415,7 @@ suite("Extension Test Suite", () => {
 
   suite("Range Calculation Tests", () => {
     test("Should calculate correct range for blade components", () => {
-      const provider = new ComponentDocumentLinkProvider();
+      const _provider = new ComponentDocumentLinkProvider();
       const line = '<x-modal class="test">';
       const regex = /<x-([a-zA-Z0-9\-_.]+)/g;
       const match = regex.exec(line);
