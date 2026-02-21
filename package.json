@@ -3,7 +3,7 @@
   "displayName": "laravel-livewire-go-to",
   "description": "Go to support with ctrl+click to switch between components in laravel and livewire",
   "publisher": "kwasibaidoo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/kwasii1/laravel-livewire-go-to.git"
