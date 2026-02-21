@@ -27,7 +27,18 @@ export class ComponentHoverProvider implements vscode.HoverProvider {
     const componentTypeName = this.getComponentTypeName(componentInfo.type);
     const hoverText = new vscode.MarkdownString();
     hoverText.appendMarkdown(`**${componentTypeName}**\n\n`);
-    hoverText.appendCodeblock(`${componentInfo.name}`, "php");
+    
+    // Show namespace if present
+    if (componentInfo.namespace) {
+      hoverText.appendMarkdown(`*Namespace:* \`${componentInfo.namespace}\`\n\n`);
+    }
+    
+    // Show class name for class-based references
+    if (componentInfo.className) {
+      hoverText.appendCodeblock(`${componentInfo.className}`, "php");
+    } else {
+      hoverText.appendCodeblock(`${componentInfo.name}`, "php");
+    }
     hoverText.appendMarkdown("\n\n**Ctrl+Click** to go to definition");
 
     const range = new vscode.Range(
@@ -49,12 +60,20 @@ export class ComponentHoverProvider implements vscode.HoverProvider {
       case "livewire":
       case "livewire-tag":
         return "Livewire Component";
+      case "livewire-class":
+        return "Livewire Component (Class)";
       case "include":
         return "Include";
       case "extends":
         return "Layout";
       case "volt":
         return "Volt";
+      case "layout":
+        return "Livewire Layout";
+      case "route-livewire-class":
+        return "Livewire Route (Class)";
+      case "route-livewire-string":
+        return "Livewire Route";
       default:
         return "Component";
     }

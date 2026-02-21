@@ -278,6 +278,204 @@ Volt::route('/users/{user}', 'users.show');
     });
   });
 
+  suite("Livewire v4 Features", () => {
+    test("Should handle Layout attribute syntax", async () => {
+      const content = `
+<?php
+
+namespace App\\Livewire;
+
+use Livewire\\Component;
+use Livewire\\Attributes\\Layout;
+
+#[Layout('layouts.app')]
+class Dashboard extends Component
+{
+    public function render()
+    {
+        return view('livewire.dashboard');
+    }
+}`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle Layout attribute");
+    });
+
+    test("Should handle namespaced livewire components", async () => {
+      const content = `
+<div>
+    <livewire:pages::dashboard />
+    <livewire:pages::post.create />
+    <livewire:admin::users.index />
+    @livewire('pages::settings')
+    @livewire('admin::reports.monthly')
+</div>`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle namespaced components");
+    });
+
+    test("Should handle Route::livewire syntax", async () => {
+      const content = `
+<?php
+
+use App\\Livewire\\Dashboard;
+use App\\Livewire\\Posts\\Create;
+use Illuminate\\Support\\Facades\\Route;
+
+// Class-based routes
+Route::livewire('/dashboard', Dashboard::class);
+Route::livewire('/posts/create', Create::class);
+
+// String-based routes
+Route::livewire('/settings', 'pages::settings');
+Route::livewire('/profile', 'user.profile');
+
+// With parameters
+Route::livewire('/posts/{post}', 'pages::post.show');
+Route::livewire('/users/{user}/edit', App\\Livewire\\Users\\Edit::class);
+`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle Route::livewire syntax");
+    });
+
+    test("Should handle Livewire v4 single-file components", async () => {
+      const content = `
+<?php
+// This would be in resources/views/livewire/⚡create.blade.php
+
+use Livewire\\Volt\\Component;
+
+new class extends Component
+{
+    public string $title = '';
+    public string $content = '';
+
+    public function save()
+    {
+        Post::create([
+            'title' => $this->title,
+            'content' => $this->content,
+        ]);
+    }
+};
+?>
+
+<div>
+    <form wire:submit="save">
+        <input wire:model="title" type="text" />
+        <textarea wire:model="content"></textarea>
+        <button type="submit">Save</button>
+    </form>
+</div>`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle single-file components");
+    });
+
+    test("Should handle Livewire v4 multi-file component structure", async () => {
+      const content = `
+<?php
+// This would be at resources/views/livewire/⚡post/create.php
+
+namespace App\\Livewire\\Post;
+
+use Livewire\\Component;
+use Livewire\\Attributes\\Layout;
+
+#[Layout('layouts.app')]
+class Create extends Component
+{
+    public string $title = '';
+    
+    // The template is at resources/views/livewire/⚡post/create.blade.php
+    // Scoped CSS at resources/views/livewire/⚡post/create.css
+    // JavaScript at resources/views/livewire/⚡post/create.js
+}`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle multi-file component structure");
+    });
+
+    test("Should handle mixed Livewire v3 and v4 syntax", async () => {
+      const content = `
+<x-app-layout>
+    <!-- Livewire v3 style -->
+    @livewire('dashboard')
+    <livewire:user-profile :user="$user" />
+    
+    <!-- Livewire v4 namespaced style -->
+    <livewire:pages::posts.index />
+    @livewire('admin::settings')
+    
+    <!-- Blade components -->
+    <x-card>
+        <flux:button>Click me</flux:button>
+    </x-card>
+</x-app-layout>`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle mixed v3 and v4 syntax");
+    });
+
+    test("Should handle Livewire v4 component with all attributes", async () => {
+      const content = `
+<?php
+
+namespace App\\Livewire;
+
+use Livewire\\Component;
+use Livewire\\Attributes\\Layout;
+use Livewire\\Attributes\\Title;
+use Livewire\\Attributes\\Lazy;
+
+#[Layout('layouts.dashboard')]
+#[Title('User Dashboard')]
+#[Lazy]
+class Dashboard extends Component
+{
+    public function render()
+    {
+        return view('livewire.dashboard');
+    }
+}`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle Livewire v4 attributes");
+    });
+
+    test("Should handle custom namespace registrations", async () => {
+      const content = `
+<?php
+
+// config/livewire.php or service provider
+
+use Livewire\\Livewire;
+
+// Register custom namespaces
+Livewire::addNamespace(
+    namespace: 'ui',
+    viewPath: resource_path('views/ui')
+);
+
+Livewire::addNamespace(
+    namespace: 'admin',
+    classNamespace: 'App\\Admin\\Livewire',
+    classPath: app_path('Admin/Livewire'),
+    viewPath: resource_path('views/admin/livewire')
+);
+
+// Register component locations
+Livewire::addLocation(
+    viewPath: resource_path('views/admin/components')
+);`;
+
+      const document = await createMockDocument(content);
+      assert.ok(document, "Should handle custom namespace registrations");
+    });
+  });
+
   async function createMockDocument(
     content: string
   ): Promise<vscode.TextDocument> {

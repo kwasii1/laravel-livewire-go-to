@@ -457,6 +457,199 @@ suite("DefinitionProvider Unit Tests", () => {
     });
   });
 
+  suite("Livewire v4 Layout Path Resolution", () => {
+    test("Should generate correct layout paths", () => {
+      const workspaceRoot = "/test/workspace";
+      const paths = (provider as any).getLayoutPaths("layouts.app", workspaceRoot);
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("resources/views/layouts/layouts/app.blade.php")
+        )
+      );
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("resources/views/components/layouts/layouts/app.blade.php")
+        )
+      );
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("resources/views/layouts/app.blade.php")
+        )
+      );
+    });
+
+    test("Should handle nested layout names", () => {
+      const workspaceRoot = "/test/workspace";
+      const paths = (provider as any).getLayoutPaths("admin.layouts.sidebar", workspaceRoot);
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("admin/layouts/sidebar.blade.php")
+        )
+      );
+    });
+  });
+
+  suite("Livewire v4 Route::livewire Path Resolution", () => {
+    test("Should generate correct paths for Route::livewire with class", () => {
+      const workspaceRoot = "/test/workspace";
+      const paths = (provider as any).getRouteLivewireClassPaths("Dashboard", workspaceRoot, undefined);
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("app/Livewire/Dashboard.php")
+        )
+      );
+    });
+
+    test("Should generate bolt icon file paths", () => {
+      const workspaceRoot = "/test/workspace";
+      const paths = (provider as any).getRouteLivewireClassPaths("CreatePost", workspaceRoot, undefined);
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("⚡create-post.blade.php")
+        )
+      );
+    });
+
+    test("Should resolve class import and generate paths", () => {
+      const workspaceRoot = "/test/workspace";
+      const documentText = `<?php
+use App\\Livewire\\Dashboard;
+
+Route::livewire('/dashboard', Dashboard::class);
+`;
+      const paths = (provider as any).getRouteLivewireClassPaths("Dashboard", workspaceRoot, documentText);
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("app/Livewire/Dashboard.php")
+        )
+      );
+    });
+  });
+
+  suite("Livewire v4 Namespaced Component Paths", () => {
+    test("Should generate correct paths for namespaced livewire components", () => {
+      const workspaceRoot = "/test/workspace";
+      const componentInfo = {
+        name: "post.create",
+        type: "livewire-tag" as const,
+        fullMatch: "<livewire:pages::post.create />",
+        startIndex: 0,
+        endIndex: 30,
+        namespace: "pages",
+      };
+      const paths = (provider as any).getLivewireComponentPaths(
+        componentInfo.name,
+        workspaceRoot,
+        componentInfo
+      );
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      // Should include paths in the pages namespace
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("pages") && p.includes("post/create")
+        )
+      );
+    });
+
+    test("Should generate bolt icon paths for namespaced components", () => {
+      const workspaceRoot = "/test/workspace";
+      const componentInfo = {
+        name: "dashboard",
+        type: "livewire-tag" as const,
+        fullMatch: "<livewire:pages::dashboard />",
+        startIndex: 0,
+        endIndex: 27,
+        namespace: "pages",
+      };
+      const paths = (provider as any).getLivewireComponentPaths(
+        componentInfo.name,
+        workspaceRoot,
+        componentInfo
+      );
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      // Should include bolt icon paths
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("⚡dashboard.blade.php")
+        )
+      );
+    });
+  });
+
+  suite("Livewire v4 Bolt Icon File Paths", () => {
+    test("Should include bolt icon single-file component paths", () => {
+      const workspaceRoot = "/test/workspace";
+      const paths = (provider as any).getLivewireComponentPaths(
+        "create",
+        workspaceRoot,
+        undefined
+      );
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("resources/views/livewire/⚡create.blade.php")
+        )
+      );
+    });
+
+    test("Should include bolt icon multi-file component directory paths", () => {
+      const workspaceRoot = "/test/workspace";
+      const paths = (provider as any).getLivewireComponentPaths(
+        "post.create",
+        workspaceRoot,
+        undefined
+      );
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      // Should include multi-file component paths
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("⚡post/create") && p.includes("create.blade.php")
+        )
+      );
+    });
+
+    test("Should fallback to standard paths when bolt icon files not found", () => {
+      const workspaceRoot = "/test/workspace";
+      const paths = (provider as any).getLivewireComponentPaths(
+        "user.profile",
+        workspaceRoot,
+        undefined
+      );
+
+      const normalizedPaths = paths.map((p: string) => p.replace(/\\/g, "/"));
+
+      // Should include standard paths as fallback
+      assert.ok(
+        normalizedPaths.some((p: string) =>
+          p.includes("resources/views/livewire/user/profile.blade.php")
+        )
+      );
+    });
+  });
+
   async function createMockDocument(
     content: string
   ): Promise<vscode.TextDocument> {
