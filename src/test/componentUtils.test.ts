@@ -23,6 +23,20 @@ suite("ComponentUtils Unit Tests", () => {
       assert.strictEqual(result?.name, "button-group");
       assert.strictEqual(result?.type, "blade");
     });
+
+    test("Should extract blade component with namespace", () => {
+      const result = ComponentUtils.extractComponentInfo("<x-layouts::app.sidebar>", 15);
+      assert.strictEqual(result?.name, "app.sidebar");
+      assert.strictEqual(result?.type, "blade");
+      assert.strictEqual(result?.namespace, "layouts");
+    });
+
+    test("Should extract blade component with namespace (simple)", () => {
+      const result = ComponentUtils.extractComponentInfo("<x-admin::nav>", 10);
+      assert.strictEqual(result?.name, "nav");
+      assert.strictEqual(result?.type, "blade");
+      assert.strictEqual(result?.namespace, "admin");
+    });
   });
 
   suite("Flux Component Extraction", () => {
@@ -280,6 +294,202 @@ suite("ComponentUtils Unit Tests", () => {
       );
       assert.strictEqual(result?.name, "user.profile");
       assert.strictEqual(result?.type, "livewire");
+    });
+  });
+
+  suite("Livewire v4 Layout Attribute Extraction", () => {
+    test("Should extract layout attribute with single quotes", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "#[Layout('layouts.app')]",
+        15
+      );
+      assert.strictEqual(result?.name, "layouts.app");
+      assert.strictEqual(result?.type, "layout");
+    });
+
+    test("Should extract layout attribute with double quotes", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        '#[Layout("components.layouts.main")]',
+        20
+      );
+      assert.strictEqual(result?.name, "components.layouts.main");
+      assert.strictEqual(result?.type, "layout");
+    });
+
+    test("Should extract layout with whitespace", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "#[Layout( 'layouts.app' )]",
+        15
+      );
+      assert.strictEqual(result?.name, "layouts.app");
+      assert.strictEqual(result?.type, "layout");
+    });
+  });
+
+  suite("Livewire v4 Namespaced Components", () => {
+    test("Should extract namespaced livewire tag", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "<livewire:pages::post.create />",
+        20
+      );
+      assert.strictEqual(result?.name, "post.create");
+      assert.strictEqual(result?.namespace, "pages");
+      assert.strictEqual(result?.type, "livewire-tag");
+    });
+
+    test("Should extract namespaced livewire directive", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "@livewire('pages::dashboard')",
+        18
+      );
+      assert.strictEqual(result?.name, "dashboard");
+      assert.strictEqual(result?.namespace, "pages");
+      assert.strictEqual(result?.type, "livewire");
+    });
+
+    test("Should extract admin namespaced component", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "<livewire:admin::users.list />",
+        18
+      );
+      assert.strictEqual(result?.name, "users.list");
+      assert.strictEqual(result?.namespace, "admin");
+      assert.strictEqual(result?.type, "livewire-tag");
+    });
+
+    test("Should handle non-namespaced components correctly", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "<livewire:post.create />",
+        15
+      );
+      assert.strictEqual(result?.name, "post.create");
+      assert.strictEqual(result?.namespace, undefined);
+      assert.strictEqual(result?.type, "livewire-tag");
+    });
+  });
+
+  suite("Livewire v4 Route::livewire Extraction", () => {
+    test("Should extract Route::livewire with class reference", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "Route::livewire('/dashboard', Dashboard::class);",
+        35
+      );
+      assert.strictEqual(result?.name, "dashboard");
+      assert.strictEqual(result?.className, "Dashboard");
+      assert.strictEqual(result?.type, "route-livewire-class");
+    });
+
+    test("Should extract Route::livewire with namespaced class", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "Route::livewire('/posts', App\\Livewire\\Posts::class);",
+        40
+      );
+      assert.strictEqual(result?.className, "App\\Livewire\\Posts");
+      assert.strictEqual(result?.type, "route-livewire-class");
+    });
+
+    test("Should extract Route::livewire with string", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "Route::livewire('/dashboard', 'pages::dashboard');",
+        40
+      );
+      assert.strictEqual(result?.name, "dashboard");
+      assert.strictEqual(result?.namespace, "pages");
+      assert.strictEqual(result?.type, "route-livewire-string");
+    });
+
+    test("Should extract Route::livewire with non-namespaced string", () => {
+      const result = ComponentUtils.extractComponentInfo(
+        "Route::livewire('/posts', 'post.index');",
+        32
+      );
+      assert.strictEqual(result?.name, "post.index");
+      assert.strictEqual(result?.namespace, undefined);
+      assert.strictEqual(result?.type, "route-livewire-string");
+    });
+  });
+
+  suite("PHP Import Resolver", () => {
+    test("Should resolve direct import", () => {
+      const documentText = `<?php
+use App\\Livewire\\Dashboard;
+
+Route::livewire('/dashboard', Dashboard::class);
+`;
+      const result = ComponentUtils.resolveClassImport(documentText, "Dashboard");
+      assert.strictEqual(result, "App\\Livewire\\Dashboard");
+    });
+
+    test("Should resolve aliased import", () => {
+      const documentText = `<?php
+use App\\Livewire\\Dashboard as DashboardComponent;
+
+Route::livewire('/dashboard', DashboardComponent::class);
+`;
+      const result = ComponentUtils.resolveClassImport(documentText, "DashboardComponent");
+      assert.strictEqual(result, "App\\Livewire\\Dashboard");
+    });
+
+    test("Should resolve group import", () => {
+      const documentText = `<?php
+use App\\Livewire\\{Dashboard, Posts, Users};
+
+Route::livewire('/dashboard', Dashboard::class);
+`;
+      const result = ComponentUtils.resolveClassImport(documentText, "Dashboard");
+      assert.strictEqual(result, "App\\Livewire\\Dashboard");
+    });
+
+    test("Should return default namespace for unknown class", () => {
+      const documentText = `<?php
+
+Route::livewire('/dashboard', Dashboard::class);
+`;
+      const result = ComponentUtils.resolveClassImport(documentText, "Dashboard");
+      assert.strictEqual(result, "App\\Livewire\\Dashboard");
+    });
+
+    test("Should return class as-is if already namespaced", () => {
+      const documentText = `<?php
+
+Route::livewire('/dashboard', App\\Livewire\\Dashboard::class);
+`;
+      const result = ComponentUtils.resolveClassImport(documentText, "App\\Livewire\\Dashboard");
+      assert.strictEqual(result, "App\\Livewire\\Dashboard");
+    });
+  });
+
+  suite("Class Name to Path Conversion", () => {
+    test("Should convert App namespace to app directory", () => {
+      const paths = ComponentUtils.classNameToPath("App\\Livewire\\Dashboard", "C:\\project");
+      assert.ok(paths.some(p => p.includes("app\\Livewire\\Dashboard.php") || p.includes("app/Livewire/Dashboard.php")));
+    });
+
+    test("Should handle nested namespaces", () => {
+      const paths = ComponentUtils.classNameToPath("App\\Http\\Livewire\\Posts\\Index", "C:\\project");
+      assert.ok(paths.some(p => p.includes("Http\\Livewire\\Posts\\Index.php") || p.includes("Http/Livewire/Posts/Index.php")));
+    });
+  });
+
+  suite("Bolt Path Generation (toBoltPath)", () => {
+    test("Should add bolt icon to last segment of path", () => {
+      const result = ComponentUtils.toBoltPath("settings/appearance");
+      assert.strictEqual(result, "settings/⚡appearance");
+    });
+
+    test("Should add bolt icon to nested path", () => {
+      const result = ComponentUtils.toBoltPath("pages/settings/profile");
+      assert.strictEqual(result, "pages/settings/⚡profile");
+    });
+
+    test("Should handle single segment path", () => {
+      const result = ComponentUtils.toBoltPath("dashboard");
+      assert.strictEqual(result, "⚡dashboard");
+    });
+
+    test("Should handle deeply nested path", () => {
+      const result = ComponentUtils.toBoltPath("admin/users/permissions/edit");
+      assert.strictEqual(result, "admin/users/permissions/⚡edit");
     });
   });
 });

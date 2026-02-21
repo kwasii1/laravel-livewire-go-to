@@ -14,6 +14,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance optimizations for large projects
 - Multi-workspace support improvements
 
+## [1.1.0] - 2026-02-21
+
+### Added
+
+- **Livewire v4 Support**:
+  - Single-file components with bolt icon prefix (`⚡component.blade.php`)
+  - Multi-file component directories (`⚡component/index.blade.php`)
+  - `#[Layout('path')]` attribute navigation
+  - `->layout('path')` method navigation
+  - `Route::livewire()` routing support (both class and string syntax)
+- **Namespace Support**:
+  - Namespaced Livewire components (`pages::settings.appearance`, `admin::dashboard`)
+  - Namespaced blade components (`x-layouts::app.sidebar`, `x-admin::nav`)
+  - Namespaced layouts (`layouts::dashboard`)
+- **Improved Path Resolution**:
+  - Bolt icon paths correctly place ⚡ before final segment (`settings/⚡appearance.blade.php`)
+  - Support for `config/livewire.php` namespace configuration
+  - PHP `use` statement resolution for class-based references
+
+### Fixed
+
+- Bolt icon path generation now correctly prefixes the last segment
+- Blade component namespace resolution
+
 ## [0.0.1] - 2025-08-05
 
 ### Added
