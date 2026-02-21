@@ -8,10 +8,13 @@ A VS Code extension that provides seamless navigation between Laravel components
 
 Navigate instantly to component files by Ctrl+clicking on:
 
-- **Blade Components**: `<x-button>`, `<x-forms.input>`
+- **Blade Components**: `<x-button>`, `<x-forms.input>`, `<x-layouts::app.sidebar>`
 - **Flux Components**: `<flux:button>`, `<flux:input>`
 - **Livewire Components**: `@livewire('user-profile')`, `<livewire:user-profile>`
+- **Livewire v4 Components**: `<livewire:pages::settings.appearance>` (⚡ single-file components)
 - **Livewire Classes**: `@livewire(UserProfile::class)`
+- **Layout Attributes**: `#[Layout('layouts::dashboard')]`
+- **Route Livewire**: `Route::livewire('/path', Component::class)`
 - **Blade Directives**: `@include('partials.header')`, `@extends('layouts.app')`
 - **Volt Routes**: `Volt::route('/profile', 'pages.profile')`
 
@@ -37,7 +40,10 @@ Clickable links throughout your code that take you directly to:
 Automatically resolves components following Laravel conventions:
 
 - **Blade Components**: `resources/views/components/`
+- **Namespaced Blade**: `resources/views/{namespace}/` (e.g., `x-layouts::sidebar`)
 - **Livewire Components**: `app/Livewire/`, `app/Http/Livewire/`
+- **Livewire v4 Single-File**: `resources/views/livewire/⚡component.blade.php`
+- **Livewire v4 Namespaced**: `resources/views/{namespace}/⚡component.blade.php`
 - **Blade Templates**: `resources/views/`
 - **Volt Pages**: `resources/views/pages/`, `resources/views/livewire/`
 - **Flux Components**: `resources/views/flux`, `vendor\livewire\flux\stubs\resources\views\flux`
@@ -88,6 +94,42 @@ This extension works out of the box with no configuration required. It follows L
 <livewire:user-profile />
 ```
 
+### Livewire v4 Single-File Components
+
+```blade
+<!-- Navigate to resources/views/pages/settings/⚡appearance.blade.php -->
+<livewire:pages::settings.appearance />
+
+<!-- Using Route::livewire -->
+Route::livewire('/settings', 'pages::settings.profile');
+Route::livewire('/dashboard', Dashboard::class);
+```
+
+### Layout Attributes (Livewire v4)
+
+```php
+// #[Layout] attribute - navigates to resources/views/layouts/dashboard.blade.php
+new #[Layout('layouts::dashboard')] class extends Component {
+    // ...
+};
+
+// layout() method
+public function render() {
+    return view('livewire.posts.index')
+        ->layout('layouts::dashboard');
+}
+```
+
+### Namespaced Blade Components
+
+```blade
+<!-- Navigate to resources/views/layouts/app/sidebar.blade.php -->
+<x-layouts::app.sidebar />
+
+<!-- Navigate to resources/views/admin/nav.blade.php -->
+<x-admin::nav />
+```
+
 ### Flux Components
 
 ```blade
@@ -136,11 +178,19 @@ Volt::route('/profile', 'pages.profile');
 
 ## Known Issues
 
-- Custom component namespaces may require manual path configuration
 - Some complex nested component structures might not be resolved automatically
 - Performance may vary with very large Laravel projects
 
 ## Release Notes
+
+### 1.1.0 - Livewire v4 Support
+
+- ✅ **Livewire v4 single-file components** with bolt icon (⚡) prefix
+- ✅ **`#[Layout]` attribute** navigation
+- ✅ **`->layout()` method** navigation
+- ✅ **`Route::livewire()`** routing support
+- ✅ **Namespace support** for Livewire, Blade, and Layout components
+- ✅ **Multi-file component directories** support
 
 ### 0.0.1 - Initial Release
 
